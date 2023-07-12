@@ -5,9 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtToken {
-
-    public String generateToken(Authentication authentication){
-
-    }
+    
 
 }
