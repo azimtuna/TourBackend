@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,7 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -45,12 +46,8 @@ public class SecurityConfig {
         return new JwtFilter();
     }
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService){
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authenticationProvider);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     CorsConfigurationSource myCors() {
@@ -69,15 +66,15 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return  NoOpPasswordEncoder.getInstance();
-    }
-
-//    @Bean
-//    public BCryptPasswordEncoder passwordEncoder(){
-//        return new BCryptPasswordEncoder();
+    //@Bean
+    //public PasswordEncoder passwordEncoder() {
+//        return  NoOpPasswordEncoder.getInstance();
 //    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
 
 

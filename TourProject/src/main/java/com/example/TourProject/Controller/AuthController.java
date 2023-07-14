@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,11 +26,15 @@ public class AuthController {
     private final JwtToken jwtToken;
     private final AuthenticationManager authenticationManager;
 
-    public AuthController(UserService userService, ModelMapper modelMapper, JwtToken jwtToken, AuthenticationManager authenticationManager) {
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
+    public AuthController(UserService userService, ModelMapper modelMapper, JwtToken jwtToken, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userService = userService;
         this.modelMapper = modelMapper;
         this.jwtToken = jwtToken;
         this.authenticationManager = authenticationManager;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @PostMapping("/login")
@@ -53,6 +58,7 @@ public class AuthController {
         if(userService.isUserExist(authRequestDto.getEmail())){
             return new ResponseEntity<>("This username is in use", HttpStatus.BAD_REQUEST);
         }
+        authRequestDto.setPassword(bCryptPasswordEncoder.encode(authRequestDto.getPassword()));
         userService.register(modelMapper.map(authRequestDto, UserRegisterDto.class));
         return new ResponseEntity<>("Created",HttpStatus.CREATED);
     }
