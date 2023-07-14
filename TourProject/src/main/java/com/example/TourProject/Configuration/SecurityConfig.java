@@ -43,11 +43,14 @@ public class SecurityConfig {
 
     @Bean
     public JwtFilter jwtFilter(){
+
         return new JwtFilter();
     }
+  
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
+
     }
 
     CorsConfigurationSource myCors() {
